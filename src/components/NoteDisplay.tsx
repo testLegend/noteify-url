@@ -47,8 +47,8 @@ const NoteDisplay: React.FC<NoteDisplayProps> = ({ content, sourceUrl }) => {
       </div>
       
       <Card className="overflow-hidden shadow-lg">
-        <CardContent className="p-6" ref={noteRef}>
-          <div id="note-content" className="note-content prose prose-slate max-w-none">
+        <CardContent className="p-6 pt-8" ref={noteRef}>
+          <div id="note-content" className="note-content prose prose-slate prose-headings:font-bold prose-headings:mt-6 prose-headings:mb-4 prose-p:my-3 prose-li:my-1 prose-blockquote:bg-blue-50 prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:my-4 prose-blockquote:rounded-r prose-strong:text-blue-800 prose-hr:my-6 prose-a:text-blue-600 hover:prose-a:text-blue-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm max-w-none">
             {parse(content)}
           </div>
           

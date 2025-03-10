@@ -49,7 +49,9 @@ export class WebScraperService {
     const elementsToRemove = [
       'script', 'style', 'svg', 'img', 'iframe', 'nav', 'footer', 
       'header', 'aside', 'form', 'button', '[role="banner"]', 
-      '[role="navigation"]', '[role="complementary"]'
+      '[role="navigation"]', '[role="complementary"]', 
+      '.ads', '.advertisement', '.cookie-banner', '.newsletter', 
+      '.popup', '.modal', '.sidebar', '.comment'
     ];
     
     elementsToRemove.forEach(selector => {
@@ -59,7 +61,9 @@ export class WebScraperService {
     // Extract main content - try different content selectors
     const contentSelectors = [
       'article', 'main', '[role="main"]', '.content', '.post', 
-      '.post-content', '.entry-content', '#content'
+      '.post-content', '.entry-content', '#content', '.article', 
+      '.page-content', '.main-content', '.article-content',
+      '[itemprop="articleBody"]', '.story-body'
     ];
     
     let mainContent = null;
@@ -72,13 +76,51 @@ export class WebScraperService {
       }
     }
     
-    // If no main content is found, use the body
+    // If no main content is found, try to get the largest content block
     if (!mainContent) {
-      mainContent = doc.body;
+      const allParagraphs = Array.from(doc.querySelectorAll('p'));
+      const blocks: Record<string, Element[]> = {};
+      
+      // Group paragraphs by their parent to find the largest group
+      allParagraphs.forEach(p => {
+        const parent = p.parentElement;
+        if (parent) {
+          const parentSelector = this.getElementPath(parent);
+          if (!blocks[parentSelector]) {
+            blocks[parentSelector] = [];
+          }
+          blocks[parentSelector].push(p);
+        }
+      });
+      
+      // Find the parent with the most paragraphs
+      let largestBlockParent = '';
+      let largestBlockSize = 0;
+      
+      Object.entries(blocks).forEach(([parent, paragraphs]) => {
+        if (paragraphs.length > largestBlockSize) {
+          largestBlockSize = paragraphs.length;
+          largestBlockParent = parent;
+        }
+      });
+      
+      // Use the parent with the most paragraphs
+      if (largestBlockParent && largestBlockSize > 3) {
+        mainContent = doc.querySelector(largestBlockParent);
+      } else {
+        mainContent = doc.body;
+      }
     }
     
     // Format the content
-    return this.formatContent(mainContent);
+    return this.formatContent(mainContent || doc.body);
+  }
+  
+  private static getElementPath(element: Element): string {
+    // Generate a CSS selector for an element based on its tag and classes
+    const tag = element.tagName.toLowerCase();
+    const classes = Array.from(element.classList).map(c => `.${c}`).join('');
+    return tag + classes;
   }
 
   private static formatContent(element: Element): string {
@@ -89,13 +131,16 @@ export class WebScraperService {
     const headings = Array.from(element.querySelectorAll('h1, h2, h3, h4, h5, h6'));
     const paragraphs = Array.from(element.querySelectorAll('p'));
     const lists = Array.from(element.querySelectorAll('ul, ol'));
+    const tables = Array.from(element.querySelectorAll('table'));
     
     // Combine all content
     let formattedContent = `<h1>${title}</h1>`;
     
     // Add headings with their hierarchy preserved
     headings.forEach(heading => {
-      formattedContent += heading.outerHTML;
+      if (heading.textContent && heading.textContent.trim().length > 0) {
+        formattedContent += heading.outerHTML;
+      }
     });
     
     // Add paragraphs
@@ -107,7 +152,16 @@ export class WebScraperService {
     
     // Add lists
     lists.forEach(list => {
-      formattedContent += list.outerHTML;
+      if (list.textContent && list.textContent.trim().length > 0) {
+        formattedContent += list.outerHTML;
+      }
+    });
+    
+    // Add tables
+    tables.forEach(table => {
+      if (table.textContent && table.textContent.trim().length > 0) {
+        formattedContent += table.outerHTML;
+      }
     });
     
     return formattedContent;
