@@ -52,8 +52,8 @@ ${content}
 `;
 
       console.log('Sending request to Gemini API');
-      // Updated to use the latest Gemini 1.0 Pro endpoint
-      const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent', {
+      // Updated to use the Gemini 2.0 Flash model
+      const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
