@@ -48,12 +48,13 @@ const NoteDisplay: React.FC<NoteDisplayProps> = ({ content, sourceUrl }) => {
       
       <Card className="overflow-hidden shadow-lg">
         <CardContent className="p-6" ref={noteRef}>
-          <div id="note-content" className="note-content">
+          <div id="note-content" className="note-content prose prose-slate max-w-none">
             {parse(content)}
           </div>
           
           <div className="mt-8 pt-4 border-t text-sm text-muted-foreground">
             <p>Source: <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{sourceUrl}</a></p>
+            <p className="mt-1">Notes generated with AI assistance</p>
           </div>
         </CardContent>
       </Card>

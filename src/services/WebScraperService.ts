@@ -1,4 +1,6 @@
 
+import { GeminiService } from './GeminiService';
+
 export class WebScraperService {
   static async scrapeWebsite(url: string): Promise<string> {
     try {
@@ -17,7 +19,21 @@ export class WebScraperService {
       console.log('Received HTML content length:', htmlContent.length);
       
       // Extract and clean the content
-      return this.extractContentFromHtml(htmlContent);
+      const extractedContent = this.extractContentFromHtml(htmlContent);
+      
+      // Generate AI-powered notes using Gemini API
+      const apiKey = GeminiService.getApiKey();
+      if (!apiKey) {
+        return extractedContent; // Fallback to basic extraction if no API key
+      }
+      
+      try {
+        const aiNotes = await GeminiService.generateNotes(extractedContent, url);
+        return aiNotes;
+      } catch (error) {
+        console.error('Error using Gemini API, falling back to basic extraction:', error);
+        return extractedContent;
+      }
     } catch (error) {
       console.error('Error scraping website:', error);
       throw error;
