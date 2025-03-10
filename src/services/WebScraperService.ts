@@ -24,7 +24,7 @@ export class WebScraperService {
       // Generate AI-powered notes using Gemini API
       const apiKey = GeminiService.getApiKey();
       if (!apiKey) {
-        return extractedContent; // Fallback to basic extraction if no API key
+        return this.formatBasicNotes(extractedContent, url);
       }
       
       try {
@@ -32,7 +32,7 @@ export class WebScraperService {
         return aiNotes;
       } catch (error) {
         console.error('Error using Gemini API, falling back to basic extraction:', error);
-        return extractedContent;
+        return this.formatBasicNotes(extractedContent, url);
       }
     } catch (error) {
       console.error('Error scraping website:', error);
@@ -165,5 +165,25 @@ export class WebScraperService {
     });
     
     return formattedContent;
+  }
+
+  // New function to format basic notes when AI generation fails
+  private static formatBasicNotes(content: string, url: string): string {
+    const domain = new URL(url).hostname;
+    const title = `Notes from ${domain}`;
+    
+    return `
+      <h1>${title}</h1>
+      <div class="executive-summary">
+        <p>These notes contain extracted content from ${url}.</p>
+        <p>The content has been organized to improve readability.</p>
+      </div>
+      <hr>
+      <div class="content">
+        ${content}
+      </div>
+      <hr>
+      <p><strong>Note:</strong> This content was extracted automatically. For better notes, please ensure your Gemini API key is valid.</p>
+    `;
   }
 }
