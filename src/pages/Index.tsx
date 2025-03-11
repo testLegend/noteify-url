@@ -7,10 +7,19 @@ import { AuthService } from '@/services/AuthService';
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { 
+  ArrowRight, 
+  BookOpen, 
+  FileDown, 
+  Shield, 
+  Image, 
+  Sparkles
+} from "lucide-react";
 import UrlInput from '@/components/UrlInput';
 import NoteDisplay from '@/components/NoteDisplay';
 import Header from '@/components/Header';
 import PremiumUpgrade from '@/components/PremiumUpgrade';
+import { Card, CardContent } from "@/components/ui/card";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -21,6 +30,7 @@ const Index = () => {
   const [apiKey, setApiKey] = useState('');
   const [showApiInput, setShowApiInput] = useState(!GeminiService.getApiKey());
   const [showPremiumUpgrade, setShowPremiumUpgrade] = useState(false);
+  const [showLandingContent, setShowLandingContent] = useState(true);
   
   useEffect(() => {
     const user = AuthService.getCurrentUser();
@@ -28,6 +38,13 @@ const Index = () => {
       navigate('/login');
     }
   }, [navigate]);
+  
+  // Hide landing content when notes are displayed
+  useEffect(() => {
+    if (noteContent) {
+      setShowLandingContent(false);
+    }
+  }, [noteContent]);
   
   const handleApiKeySave = () => {
     if (!apiKey.trim()) {
@@ -115,7 +132,13 @@ const Index = () => {
           </div>
         )}
         
-        <div className="mb-12">
+        <div className="mb-12 max-w-3xl mx-auto">
+          <div className="text-center mb-6">
+            <h1 className="text-4xl font-bold text-primary mb-3">Turn any website into readable notes</h1>
+            <p className="text-lg text-muted-foreground">
+              Noteify converts web content into well-organized, easy-to-read notes in seconds
+            </p>
+          </div>
           <UrlInput onSubmit={handleUrlSubmit} isLoading={isLoading} />
         </div>
         
@@ -138,16 +161,159 @@ const Index = () => {
           <NoteDisplay content={noteContent} sourceUrl={sourceUrl} />
         )}
         
-        {!isLoading && !noteContent && !showPremiumUpgrade && (
-          <div className="text-center py-12 max-w-md mx-auto">
-            <div className="space-y-3">
-              <p className="text-muted-foreground">
-                Enter a website URL above to convert its content into readable notes.
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Works best with article pages, blog posts, and documentation.
-              </p>
-            </div>
+        {!isLoading && !noteContent && !showPremiumUpgrade && showLandingContent && (
+          <div className="max-w-5xl mx-auto mt-12">
+            {/* How it works section */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold text-center mb-10">How Noteify Works</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="bg-primary/10 p-3 rounded-full mb-4">
+                        <Image className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-medium mb-2">1. Paste URL</h3>
+                      <p className="text-muted-foreground">
+                        Enter the URL of any article, blog post, or documentation page you want to convert
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="bg-primary/10 p-3 rounded-full mb-4">
+                        <Sparkles className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-medium mb-2">2. AI Processing</h3>
+                      <p className="text-muted-foreground">
+                        Our AI analyzes the content and extracts the most important information
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="hover:shadow-lg transition-shadow">
+                  <CardContent className="pt-6">
+                    <div className="flex flex-col items-center text-center">
+                      <div className="bg-primary/10 p-3 rounded-full mb-4">
+                        <BookOpen className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-medium mb-2">3. Get Notes</h3>
+                      <p className="text-muted-foreground">
+                        Receive well-formatted, easy-to-read notes that you can download or save
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </section>
+            
+            {/* Features section */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold text-center mb-10">Key Features</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="flex items-start">
+                  <div className="bg-primary/10 p-2 rounded-full mr-4">
+                    <Shield className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Privacy First</h3>
+                    <p className="text-muted-foreground">
+                      We don't store the content of the websites you process. Your data stays private.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="bg-primary/10 p-2 rounded-full mr-4">
+                    <FileDown className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Export as PDF</h3>
+                    <p className="text-muted-foreground">
+                      Download your notes as a PDF file for easy sharing or offline reference.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="bg-primary/10 p-2 rounded-full mr-4">
+                    <ArrowRight className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">Fast Processing</h3>
+                    <p className="text-muted-foreground">
+                      Get your notes in seconds, no matter how complex the content.
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start">
+                  <div className="bg-primary/10 p-2 rounded-full mr-4">
+                    <Sparkles className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium mb-2">AI-Powered</h3>
+                    <p className="text-muted-foreground">
+                      Utilizes advanced AI to focus on what's important and create clear, concise notes.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+            
+            {/* Usage examples section */}
+            <section className="mb-16">
+              <h2 className="text-2xl font-bold text-center mb-6">Perfect For</h2>
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
+                <ul className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  <li className="flex items-center text-slate-700">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    Research articles
+                  </li>
+                  <li className="flex items-center text-slate-700">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    Blog posts
+                  </li>
+                  <li className="flex items-center text-slate-700">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    News articles
+                  </li>
+                  <li className="flex items-center text-slate-700">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    Documentation
+                  </li>
+                  <li className="flex items-center text-slate-700">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    Educational content
+                  </li>
+                  <li className="flex items-center text-slate-700">
+                    <div className="w-2 h-2 bg-primary rounded-full mr-2"></div>
+                    Technical guides
+                  </li>
+                </ul>
+              </div>
+            </section>
+            
+            {/* CTA section */}
+            <section className="text-center">
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl p-8 text-white">
+                <h2 className="text-2xl font-bold mb-4">Ready to simplify your reading?</h2>
+                <p className="mb-6 max-w-md mx-auto">
+                  Try Noteify now and transform complex web content into clear, organized notes.
+                </p>
+                <Button 
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  size="lg" 
+                  className="bg-white text-blue-600 hover:bg-blue-50"
+                >
+                  Get Started Now
+                </Button>
+              </div>
+            </section>
           </div>
         )}
       </main>
