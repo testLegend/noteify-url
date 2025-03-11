@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '@/services/AuthService';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import PremiumUpgrade from '@/components/PremiumUpgrade';
 
 const Premium = () => {
@@ -25,11 +26,7 @@ const Premium = () => {
         <PremiumUpgrade />
       </main>
       
-      <footer className="py-6 border-t">
-        <div className="container text-center text-sm text-muted-foreground">
-          <p>© 2023 Noteify - Convert websites to beautiful notes</p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 };

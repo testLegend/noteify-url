@@ -9,7 +9,12 @@ const Header = () => {
         <Link to="/" className="flex items-center">
           <span className="text-2xl font-bold text-primary">Noteify</span>
         </Link>
-        <UserMenu />
+        <div className="flex items-center gap-4">
+          <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary hidden md:inline-block">
+            Terms & Conditions
+          </Link>
+          <UserMenu />
+        </div>
       </div>
     </header>
   );
