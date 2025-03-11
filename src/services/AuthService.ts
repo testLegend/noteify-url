@@ -8,9 +8,19 @@ interface User {
   noteCount: number;
 }
 
+interface SavedNote {
+  id: string;
+  userId: string;
+  content: string;
+  sourceUrl: string;
+  title: string;
+  createdAt: string;
+}
+
 export class AuthService {
   static readonly USERS_KEY = 'noteify_users';
   static readonly CURRENT_USER_KEY = 'noteify_current_user';
+  static readonly SAVED_NOTES_KEY = 'noteify_saved_notes';
 
   // Get all registered users
   static getUsers(): User[] {
@@ -116,5 +126,66 @@ export class AuthService {
     
     // Update current user
     localStorage.setItem(this.CURRENT_USER_KEY, JSON.stringify(user));
+  }
+
+  // Get all saved notes
+  static getSavedNotes(): SavedNote[] {
+    const notes = localStorage.getItem(this.SAVED_NOTES_KEY);
+    return notes ? JSON.parse(notes) : [];
+  }
+
+  // Get user's saved notes
+  static getUserSavedNotes(): SavedNote[] {
+    const user = this.getCurrentUser();
+    if (!user) return [];
+    
+    const allNotes = this.getSavedNotes();
+    return allNotes.filter(note => note.userId === user.id);
+  }
+
+  // Save a note
+  static saveNote(content: string, sourceUrl: string, title: string): SavedNote | null {
+    const user = this.getCurrentUser();
+    if (!user) return null;
+    
+    const newNote: SavedNote = {
+      id: crypto.randomUUID(),
+      userId: user.id,
+      content,
+      sourceUrl,
+      title,
+      createdAt: new Date().toISOString()
+    };
+    
+    const allNotes = this.getSavedNotes();
+    allNotes.push(newNote);
+    localStorage.setItem(this.SAVED_NOTES_KEY, JSON.stringify(allNotes));
+    
+    return newNote;
+  }
+
+  // Delete a note
+  static deleteNote(noteId: string): boolean {
+    const user = this.getCurrentUser();
+    if (!user) return false;
+    
+    const allNotes = this.getSavedNotes();
+    const noteIndex = allNotes.findIndex(note => note.id === noteId && note.userId === user.id);
+    
+    if (noteIndex === -1) return false;
+    
+    allNotes.splice(noteIndex, 1);
+    localStorage.setItem(this.SAVED_NOTES_KEY, JSON.stringify(allNotes));
+    
+    return true;
+  }
+
+  // Get a specific note
+  static getNote(noteId: string): SavedNote | null {
+    const user = this.getCurrentUser();
+    if (!user) return null;
+    
+    const allNotes = this.getSavedNotes();
+    return allNotes.find(note => note.id === noteId && note.userId === user.id) || null;
   }
 }

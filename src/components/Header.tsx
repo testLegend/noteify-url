@@ -21,6 +21,14 @@ const Header = () => {
             Home
           </Link>
           <Link 
+            to="/saved-notes" 
+            className={`text-sm hover:text-primary hidden md:inline-block ${
+              location.pathname === '/saved-notes' ? 'text-primary font-medium' : 'text-muted-foreground'
+            }`}
+          >
+            My Notes
+          </Link>
+          <Link 
             to="/terms" 
             className={`text-sm hover:text-primary hidden md:inline-block ${
               location.pathname === '/terms' ? 'text-primary font-medium' : 'text-muted-foreground'

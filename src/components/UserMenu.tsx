@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Crown, LogOut, User } from "lucide-react";
+import { Crown, LogOut, User, FileText } from "lucide-react";
 
 const UserMenu = () => {
   const navigate = useNavigate();
@@ -78,6 +78,10 @@ const UserMenu = () => {
         <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/profile')}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/saved-notes')}>
+          <FileText className="mr-2 h-4 w-4" />
+          <span>My Saved Notes</span>
         </DropdownMenuItem>
         {!user.isPremium && (
           <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/premium')}>
