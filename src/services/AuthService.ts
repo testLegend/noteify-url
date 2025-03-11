@@ -9,8 +9,8 @@ interface User {
 }
 
 export class AuthService {
-  private static readonly USERS_KEY = 'noteify_users';
-  private static readonly CURRENT_USER_KEY = 'noteify_current_user';
+  static readonly USERS_KEY = 'noteify_users';
+  static readonly CURRENT_USER_KEY = 'noteify_current_user';
 
   // Get all registered users
   static getUsers(): User[] {

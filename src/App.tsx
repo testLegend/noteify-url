@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Premium from "./pages/Premium";
+import Profile from "./pages/Profile";
 import Terms from "./pages/Terms";
 import NotFound from "./pages/NotFound";
 import TermsDialog from "./components/TermsDialog";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
           <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
           <Route path="/premium" element={<ProtectedRoute><Premium /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
           <Route path="/terms" element={<Terms />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

@@ -1,8 +1,10 @@
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import UserMenu from './UserMenu';
 
 const Header = () => {
+  const location = useLocation();
+  
   return (
     <header className="bg-background border-b">
       <div className="container flex h-16 items-center justify-between px-4">
@@ -10,7 +12,12 @@ const Header = () => {
           <span className="text-2xl font-bold text-primary">Noteify</span>
         </Link>
         <div className="flex items-center gap-4">
-          <Link to="/terms" className="text-sm text-muted-foreground hover:text-primary hidden md:inline-block">
+          <Link 
+            to="/terms" 
+            className={`text-sm hover:text-primary hidden md:inline-block ${
+              location.pathname === '/terms' ? 'text-primary font-medium' : 'text-muted-foreground'
+            }`}
+          >
             Terms & Conditions
           </Link>
           <UserMenu />
