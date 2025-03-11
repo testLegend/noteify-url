@@ -1,21 +1,33 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { WebScraperService } from '@/services/WebScraperService';
 import { GeminiService } from '@/services/GeminiService';
+import { AuthService } from '@/services/AuthService';
 import { useToast } from "@/components/ui/use-toast";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import UrlInput from '@/components/UrlInput';
 import NoteDisplay from '@/components/NoteDisplay';
 import Header from '@/components/Header';
+import PremiumUpgrade from '@/components/PremiumUpgrade';
 
 const Index = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [noteContent, setNoteContent] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
   const [apiKey, setApiKey] = useState('');
   const [showApiInput, setShowApiInput] = useState(!GeminiService.getApiKey());
+  const [showPremiumUpgrade, setShowPremiumUpgrade] = useState(false);
+  
+  useEffect(() => {
+    const user = AuthService.getCurrentUser();
+    if (!user) {
+      navigate('/login');
+    }
+  }, [navigate]);
   
   const handleApiKeySave = () => {
     if (!apiKey.trim()) {
@@ -37,7 +49,19 @@ const Index = () => {
   };
 
   const handleUrlSubmit = async (url: string) => {
+    // Check if user can create notes
+    if (!AuthService.canCreateNote()) {
+      setShowPremiumUpgrade(true);
+      toast({
+        title: "Note limit reached",
+        description: "You've reached your free note limit. Upgrade to premium for unlimited notes!",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsLoading(true);
+    setShowPremiumUpgrade(false);
     
     try {
       console.log('Fetching content from URL:', url);
@@ -45,6 +69,9 @@ const Index = () => {
       
       setNoteContent(content);
       setSourceUrl(url);
+      
+      // Increment note count
+      AuthService.incrementNoteCount();
       
       toast({
         title: "Notes created!",
@@ -92,6 +119,12 @@ const Index = () => {
           <UrlInput onSubmit={handleUrlSubmit} isLoading={isLoading} />
         </div>
         
+        {showPremiumUpgrade && (
+          <div className="flex justify-center my-8">
+            <PremiumUpgrade />
+          </div>
+        )}
+        
         {isLoading && (
           <div className="text-center py-12">
             <div className="inline-block rounded-full h-16 w-16 bg-primary/10 p-4">
@@ -105,7 +138,7 @@ const Index = () => {
           <NoteDisplay content={noteContent} sourceUrl={sourceUrl} />
         )}
         
-        {!isLoading && !noteContent && (
+        {!isLoading && !noteContent && !showPremiumUpgrade && (
           <div className="text-center py-12 max-w-md mx-auto">
             <div className="space-y-3">
               <p className="text-muted-foreground">

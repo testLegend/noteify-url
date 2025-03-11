@@ -1,19 +1,15 @@
 
-import { FileText } from "lucide-react";
+import { Link } from 'react-router-dom';
+import UserMenu from './UserMenu';
 
 const Header = () => {
   return (
-    <header className="w-full py-6 mb-8">
-      <div className="container flex justify-center items-center">
-        <div className="flex items-center gap-2">
-          <FileText className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold tracking-tight">Noteify</h1>
-        </div>
-      </div>
-      <div className="container mt-2 text-center">
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Transform any website into beautiful, readable notes with just a URL.
-        </p>
+    <header className="bg-background border-b">
+      <div className="container flex h-16 items-center justify-between px-4">
+        <Link to="/" className="flex items-center">
+          <span className="text-2xl font-bold text-primary">Noteify</span>
+        </Link>
+        <UserMenu />
       </div>
     </header>
   );
