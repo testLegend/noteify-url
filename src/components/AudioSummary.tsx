@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { AuthService } from '@/services/AuthService';
 import { ElevenLabsService } from '@/services/ElevenLabsService';
 import { toast } from "@/hooks/use-toast";
-import { AudioWaveform, Play, Pause, Volume2, VolumeX, Save, RotateCcw } from "lucide-react";
+import { AudioWaveform, Play, Pause, Volume2, VolumeX, Save, RotateCcw, Crown } from "lucide-react";
 
 interface AudioSummaryProps {
   content: string;
@@ -24,7 +23,6 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
   const user = AuthService.getCurrentUser();
   const isPremiumUser = user?.isPremium || false;
   
-  // Clean up audio URL when component unmounts
   useEffect(() => {
     return () => {
       if (audioUrl) {
@@ -33,7 +31,6 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     };
   }, [audioUrl]);
   
-  // Handle audio play/pause
   const togglePlayPause = () => {
     if (!audioRef.current) return;
     
@@ -46,12 +43,10 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     setIsPlaying(!isPlaying);
   };
   
-  // Handle audio ended
   const handleAudioEnded = () => {
     setIsPlaying(false);
   };
   
-  // Handle volume change
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
@@ -67,7 +62,6 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     }
   };
   
-  // Toggle mute
   const toggleMute = () => {
     if (!audioRef.current) return;
     
@@ -80,7 +74,6 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     }
   };
   
-  // Save API key
   const handleSaveApiKey = () => {
     if (!apiKey.trim()) {
       toast({
@@ -99,11 +92,9 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
       description: "ElevenLabs API key saved successfully",
     });
     
-    // Generate audio after saving API key
     handleGenerateAudio();
   };
   
-  // Generate audio summary
   const handleGenerateAudio = async () => {
     if (!content) {
       toast({
@@ -114,7 +105,6 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
       return;
     }
     
-    // Check for API key
     const apiKey = ElevenLabsService.getApiKey();
     if (!apiKey) {
       setShowApiKeyDialog(true);
@@ -124,13 +114,11 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     try {
       setIsGenerating(true);
       
-      // First delete previous audio if exists
       if (audioUrl) {
         URL.revokeObjectURL(audioUrl);
         setAudioUrl(null);
       }
       
-      // Generate new audio
       const audioBlob = await ElevenLabsService.generateAudio(content);
       const url = URL.createObjectURL(audioBlob);
       setAudioUrl(url);
@@ -151,7 +139,6 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     }
   };
   
-  // Reset audio
   const resetAudio = () => {
     if (audioUrl) {
       URL.revokeObjectURL(audioUrl);
@@ -160,7 +147,6 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     }
   };
   
-  // Save audio to device
   const saveAudio = () => {
     if (!audioUrl) return;
     
