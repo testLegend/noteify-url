@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,7 +90,7 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
     
     toast({
       title: "Success",
-      description: "ElevenLabs API key saved successfully",
+      description: "API key saved successfully",
     });
     
     handleGenerateAudio();
@@ -105,8 +106,10 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
       return;
     }
     
+    // Since we've added a free alternative, we don't need to force API key entry
+    // but still allow premium users to add their key for better quality
     const apiKey = ElevenLabsService.getApiKey();
-    if (!apiKey) {
+    if (isPremiumUser && !apiKey) {
       setShowApiKeyDialog(true);
       return;
     }
@@ -172,21 +175,14 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
               <AudioWaveform className="h-5 w-5 mr-2 text-primary" />
               Audio Summary
             </h3>
-            {isPremiumUser ? (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleGenerateAudio}
-                disabled={isGenerating}
-              >
-                {isGenerating ? "Generating..." : (audioUrl ? "Regenerate" : "Generate Audio")}
-              </Button>
-            ) : (
-              <div className="text-sm text-amber-600 flex items-center">
-                <Crown className="h-4 w-4 mr-1" />
-                Premium Feature
-              </div>
-            )}
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={handleGenerateAudio}
+              disabled={isGenerating}
+            >
+              {isGenerating ? "Generating..." : (audioUrl ? "Regenerate" : "Generate Audio")}
+            </Button>
           </div>
           
           {audioUrl && (
@@ -259,12 +255,12 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
               </div>
               
               <p className="text-xs text-muted-foreground">
-                Audio generated using ElevenLabs' natural voice technology.
+                Audio generated using browser's speech synthesis technology.
               </p>
             </div>
           )}
           
-          {!audioUrl && isPremiumUser && !isGenerating && (
+          {!audioUrl && !isGenerating && (
             <p className="text-sm text-muted-foreground">
               Generate an audio summary of your notes to listen on-the-go.
             </p>
@@ -281,31 +277,18 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
               </div>
             </div>
           )}
-          
-          {!isPremiumUser && (
-            <div className="text-sm">
-              <p className="mb-2">
-                Upgrade to Premium to unlock audio summaries of your notes.
-              </p>
-              <Button 
-                variant="default" 
-                size="sm"
-                onClick={() => window.location.href = '/premium'}
-              >
-                Upgrade to Premium
-              </Button>
-            </div>
-          )}
         </div>
       </div>
       
       <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>ElevenLabs API Key Required</DialogTitle>
+            <DialogTitle>ElevenLabs API Key (Optional)</DialogTitle>
             <DialogDescription>
-              To generate audio summaries, please enter your ElevenLabs API key. 
+              For premium quality voice, you can enter your ElevenLabs API key. 
               You can get a free API key from <a href="https://elevenlabs.io/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">ElevenLabs</a>.
+              
+              <p className="mt-2">Or click Cancel to use the free built-in browser speech synthesis.</p>
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
@@ -318,8 +301,11 @@ const AudioSummary: React.FC<AudioSummaryProps> = ({ content }) => {
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowApiKeyDialog(false)}>
-              Cancel
+            <Button variant="outline" onClick={() => {
+              setShowApiKeyDialog(false);
+              handleGenerateAudio();
+            }}>
+              Use Free Version
             </Button>
             <Button onClick={handleSaveApiKey}>
               Save Key
