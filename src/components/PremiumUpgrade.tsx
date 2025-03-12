@@ -2,10 +2,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthService } from '@/services/AuthService';
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Crown, CheckCircle } from "lucide-react";
+import { Crown, CheckCircle, Wand2, BookOpen, BadgeCheck } from "lucide-react";
 
 const PremiumUpgrade = () => {
   const navigate = useNavigate();
@@ -52,17 +52,24 @@ const PremiumUpgrade = () => {
             </div>
           </div>
           <div className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-primary mr-2" />
+            <Wand2 className="h-5 w-5 text-primary mr-2" />
             <div>
-              <h3 className="font-medium">Priority Support</h3>
-              <p className="text-sm text-muted-foreground">Get faster responses from our team</p>
+              <h3 className="font-medium">Customize Notes</h3>
+              <p className="text-sm text-muted-foreground">Modify notes with custom prompts tailored to your needs</p>
             </div>
           </div>
           <div className="flex items-start">
-            <CheckCircle className="h-5 w-5 text-primary mr-2" />
+            <BookOpen className="h-5 w-5 text-primary mr-2" />
             <div>
               <h3 className="font-medium">Advanced Formatting</h3>
               <p className="text-sm text-muted-foreground">Access to premium note templates and styling</p>
+            </div>
+          </div>
+          <div className="flex items-start">
+            <BadgeCheck className="h-5 w-5 text-primary mr-2" />
+            <div>
+              <h3 className="font-medium">Priority Support</h3>
+              <p className="text-sm text-muted-foreground">Get faster responses from our team</p>
             </div>
           </div>
         </div>

@@ -97,4 +97,84 @@ ${content}
       throw error;
     }
   }
+
+  static async customizeNotes(content: string, url: string, customPrompt: string): Promise<string> {
+    try {
+      const apiKey = this.getApiKey();
+      
+      if (!apiKey) {
+        throw new Error('Gemini API key not found');
+      }
+
+      const prompt = `
+You are a professional note-taking assistant. I want you to REVISE and CUSTOMIZE the following notes about web content.
+
+Here are the specific customization instructions from the user:
+"${customPrompt}"
+
+Please apply these customizations while maintaining:
+1. Proper HTML formatting with semantic tags
+2. Well-organized structure with clear headings
+3. Visual appeal and readability
+
+Format using semantic HTML with the following elements as needed:
+- <h1>, <h2>, <h3>, <h4> for headings
+- <p> for paragraphs
+- <ul> and <li> for unordered lists
+- <ol> and <li> for ordered lists
+- <blockquote> for definitions or important quotes
+- <pre><code> for code blocks
+- <strong> for bold/important text
+- <em> for emphasized text
+- <hr> for section breaks
+
+Here are the notes to customize (they are about content from ${url}):
+${content}
+`;
+
+      console.log('Sending customization request to Gemini API');
+      const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: prompt }
+              ]
+            }
+          ],
+          generationConfig: {
+            temperature: 0.3, // Slightly higher temperature for more creative customizations
+            topK: 40,
+            topP: 0.8,
+            maxOutputTokens: 8192,
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Gemini API detailed error:', errorData);
+        throw new Error(`Gemini API error: ${response.status} - ${errorData?.error?.message || 'Unknown error'}`);
+      }
+
+      const data = await response.json();
+      
+      // Extract the generated text from the response
+      const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      
+      if (!generatedText) {
+        throw new Error('No text was generated');
+      }
+      
+      return generatedText;
+    } catch (error) {
+      console.error('Error customizing notes with Gemini:', error);
+      throw error;
+    }
+  }
 }
