@@ -150,7 +150,7 @@ export class ElevenLabsService {
   // Create a summary if the text is too long
   private static prepareTextForConversion(text: string): string {
     // Strip HTML tags and get plain text
-    const plainText = text.replace(/<\/?[^>]+(>|$)/g, " ").trim();
+    const plainText = this.stripHtmlTags(text);
     
     // If the text is relatively short, return it as is
     if (plainText.length < 5000) {
@@ -164,10 +164,25 @@ export class ElevenLabsService {
     // Extract headings (usually important points)
     const headingMatches = text.match(/<h[1-6][^>]*>(.*?)<\/h[1-6]>/gi) || [];
     const headings = headingMatches
-      .map(h => h.replace(/<\/?[^>]+(>|$)/g, ""))
+      .map(h => this.stripHtmlTags(h))
       .join(". ");
     
     // Construct the summary with intro and key points
     return `Here's a summary of the notes: ${introduction}... The key points covered are: ${headings}`;
+  }
+
+  // Helper method to strip HTML tags from text
+  private static stripHtmlTags(html: string): string {
+    // Create a temporary div element
+    const tempDiv = document.createElement('div');
+    
+    // Set its HTML content
+    tempDiv.innerHTML = html;
+    
+    // Get the text content (this removes all HTML tags)
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    // Return the plain text after trimming whitespace
+    return plainText.replace(/\s+/g, ' ').trim();
   }
 }
