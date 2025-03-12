@@ -26,7 +26,7 @@ const UserMenu = () => {
       title: "Logged out",
       description: "You have been logged out successfully",
     });
-    navigate('/login');
+    navigate('/');
   };
   
   if (!user) {

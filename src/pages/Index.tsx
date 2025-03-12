@@ -13,7 +13,8 @@ import {
   FileDown, 
   Shield, 
   Image, 
-  Sparkles
+  Sparkles,
+  LogIn
 } from "lucide-react";
 import UrlInput from '@/components/UrlInput';
 import NoteDisplay from '@/components/NoteDisplay';
@@ -31,13 +32,8 @@ const Index = () => {
   const [showApiInput, setShowApiInput] = useState(!GeminiService.getApiKey());
   const [showPremiumUpgrade, setShowPremiumUpgrade] = useState(false);
   const [showLandingContent, setShowLandingContent] = useState(true);
-  
-  useEffect(() => {
-    const user = AuthService.getCurrentUser();
-    if (!user) {
-      navigate('/login');
-    }
-  }, [navigate]);
+  const [isLoginPromptVisible, setIsLoginPromptVisible] = useState(false);
+  const user = AuthService.getCurrentUser();
   
   // Hide landing content when notes are displayed
   useEffect(() => {
@@ -66,6 +62,17 @@ const Index = () => {
   };
 
   const handleUrlSubmit = async (url: string) => {
+    // Check if user is logged in
+    if (!user) {
+      setIsLoginPromptVisible(true);
+      toast({
+        title: "Login required",
+        description: "You need to log in to generate notes",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     // Check if user can create notes
     if (!AuthService.canCreateNote()) {
       setShowPremiumUpgrade(true);
@@ -112,7 +119,7 @@ const Index = () => {
       <Header />
       
       <main className="flex-grow container px-4 py-8">
-        {showApiInput && (
+        {showApiInput && user && (
           <div className="mb-8 p-4 border border-amber-200 bg-amber-50 rounded-lg max-w-2xl mx-auto">
             <h2 className="text-lg font-semibold mb-2">Gemini API Key Required</h2>
             <p className="text-sm text-muted-foreground mb-4">
@@ -142,7 +149,24 @@ const Index = () => {
           <UrlInput onSubmit={handleUrlSubmit} isLoading={isLoading} />
         </div>
         
-        {showPremiumUpgrade && (
+        {isLoginPromptVisible && !user && (
+          <div className="my-8 p-6 border border-primary/20 bg-primary/5 rounded-lg max-w-2xl mx-auto text-center">
+            <h2 className="text-xl font-semibold mb-3">Login Required</h2>
+            <p className="mb-4 text-muted-foreground">
+              You need to log in or create an account to generate notes.
+            </p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => navigate('/login')} className="gap-2">
+                <LogIn className="h-4 w-4" /> Log In
+              </Button>
+              <Button onClick={() => navigate('/register')} variant="outline">
+                Create Account
+              </Button>
+            </div>
+          </div>
+        )}
+        
+        {showPremiumUpgrade && user && (
           <div className="flex justify-center my-8">
             <PremiumUpgrade />
           </div>

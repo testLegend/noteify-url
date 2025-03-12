@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -14,6 +15,7 @@ import {
 import { Wand2 } from "lucide-react";
 import { GeminiService } from '@/services/GeminiService';
 import { useToast } from "@/hooks/use-toast";
+import { AuthService } from '@/services/AuthService';
 
 interface CustomizeNoteDialogProps {
   content: string;
@@ -26,12 +28,36 @@ const CustomizeNoteDialog: React.FC<CustomizeNoteDialogProps> = ({
   sourceUrl,
   onNoteUpdate
 }) => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const user = AuthService.getCurrentUser();
 
   const handleSubmit = async () => {
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "You need to log in to customize notes",
+        variant: "destructive",
+      });
+      setIsOpen(false);
+      navigate('/login');
+      return;
+    }
+
+    if (!user.isPremium) {
+      toast({
+        title: "Premium Required",
+        description: "Note customization is a premium feature",
+        variant: "destructive",
+      });
+      setIsOpen(false);
+      navigate('/premium');
+      return;
+    }
+
     if (!customPrompt.trim()) {
       toast({
         title: "Error",
