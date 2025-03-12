@@ -8,6 +8,7 @@ import parse from 'html-react-parser';
 import { AuthService } from '@/services/AuthService';
 import { toast } from "@/hooks/use-toast";
 import CustomizeNoteDialog from './CustomizeNoteDialog';
+import AudioSummary from './AudioSummary';
 
 interface NoteDisplayProps {
   content: string;
@@ -128,6 +129,9 @@ const NoteDisplay: React.FC<NoteDisplayProps> = ({ content, sourceUrl }) => {
           <div id="note-content" className="note-content prose prose-slate prose-headings:font-bold prose-headings:mt-6 prose-headings:mb-4 prose-p:my-3 prose-li:my-1 prose-blockquote:bg-blue-50 prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:my-4 prose-blockquote:rounded-r prose-strong:text-blue-800 prose-hr:my-6 prose-a:text-blue-600 hover:prose-a:text-blue-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm max-w-none">
             {parse(noteContent)}
           </div>
+          
+          {/* Add the AudioSummary component */}
+          <AudioSummary content={noteContent} />
           
           <div className="mt-8 pt-4 border-t text-sm text-muted-foreground">
             <p>Source: <a href={sourceUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{sourceUrl}</a></p>
