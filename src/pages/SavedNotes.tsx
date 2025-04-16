@@ -13,15 +13,17 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileDown, Eye, Trash2 } from "lucide-react";
+import { FileDown, Eye, Edit, Trash2 } from "lucide-react";
 import { PdfExporter } from '@/utils/PdfExporter';
 import { toast } from "@/hooks/use-toast";
 import NoteDisplay from '@/components/NoteDisplay';
+import NotesEditor from '@/components/NotesEditor';
 
 const SavedNotes = () => {
   const navigate = useNavigate();
   const [notes, setNotes] = useState<any[]>([]);
   const [selectedNote, setSelectedNote] = useState<any | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
   
   useEffect(() => {
     const user = AuthService.getCurrentUser();
@@ -90,6 +92,41 @@ const SavedNotes = () => {
     }
   };
   
+  const handleEditorSave = (newContent: string) => {
+    if (selectedNote) {
+      // Update the note content
+      const updatedNote = {
+        ...selectedNote,
+        content: newContent,
+        updatedAt: new Date().toISOString(),
+      };
+      
+      // Update in AuthService
+      const success = AuthService.updateNote(updatedNote);
+      
+      if (success) {
+        // Update local state
+        setSelectedNote(updatedNote);
+        setNotes(notes.map(note => 
+          note.id === selectedNote.id ? updatedNote : note
+        ));
+        
+        setIsEditing(false);
+        
+        toast({
+          title: "Note updated",
+          description: "Your note has been successfully updated",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update the note",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+  
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return new Intl.DateTimeFormat('en-US', {
@@ -98,6 +135,31 @@ const SavedNotes = () => {
       year: 'numeric',
     }).format(date);
   };
+  
+  if (selectedNote && isEditing) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="container px-4 flex-1 mx-auto">
+          <div className="my-4">
+            <Button 
+              variant="outline" 
+              className="mb-4" 
+              onClick={() => setIsEditing(false)}
+            >
+              ← Back to note
+            </Button>
+            <NotesEditor 
+              content={selectedNote.content} 
+              onSave={handleEditorSave} 
+              onCancel={() => setIsEditing(false)} 
+            />
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
   if (selectedNote) {
     return (
@@ -112,6 +174,27 @@ const SavedNotes = () => {
             >
               ← Back to all notes
             </Button>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-2xl font-bold">{selectedNote.title || 'Untitled Note'}</h2>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => setIsEditing(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit Note
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => handleExportPdf(selectedNote)}
+                  className="flex items-center gap-2"
+                >
+                  <FileDown className="h-4 w-4" />
+                  Download PDF
+                </Button>
+              </div>
+            </div>
             <NoteDisplay content={selectedNote.content} sourceUrl={selectedNote.sourceUrl} />
           </div>
         </div>
@@ -157,6 +240,18 @@ const SavedNotes = () => {
                     >
                       <Eye className="h-4 w-4" />
                       <span className="sr-only md:not-sr-only md:inline-block">View</span>
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="gap-1"
+                      onClick={() => {
+                        setSelectedNote(note);
+                        setIsEditing(true);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only md:not-sr-only md:inline-block">Edit</span>
                     </Button>
                     <Button 
                       variant="outline" 

@@ -1,4 +1,3 @@
-
 interface User {
   id: string;
   email: string;
@@ -187,5 +186,33 @@ export class AuthService {
     
     const allNotes = this.getSavedNotes();
     return allNotes.find(note => note.id === noteId && note.userId === user.id) || null;
+  }
+
+  /**
+   * Update an existing note
+   * @param updatedNote The updated note object
+   * @returns boolean indicating success
+   */
+  static updateNote(updatedNote: any): boolean {
+    try {
+      const user = this.getCurrentUser();
+      if (!user) return false;
+      
+      // Get saved notes
+      const savedNotes = this.getUserSavedNotes();
+      
+      // Find and update the note
+      const updatedNotes = savedNotes.map(note => 
+        note.id === updatedNote.id ? updatedNote : note
+      );
+      
+      // Save updated notes
+      localStorage.setItem(`notes_${user.id}`, JSON.stringify(updatedNotes));
+      
+      return true;
+    } catch (error) {
+      console.error('Error updating note:', error);
+      return false;
+    }
   }
 }

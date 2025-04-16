@@ -2,13 +2,14 @@
 import { useRef, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { FileDown, Save } from "lucide-react";
+import { FileDown, Save, Edit, Eye } from "lucide-react";
 import { PdfExporter } from '@/utils/PdfExporter';
 import parse from 'html-react-parser';
 import { AuthService } from '@/services/AuthService';
 import { toast } from "@/hooks/use-toast";
 import CustomizeNoteDialog from './CustomizeNoteDialog';
 import AudioSummary from './AudioSummary';
+import NotesEditor from './NotesEditor';
 
 interface NoteDisplayProps {
   content: string;
@@ -19,6 +20,7 @@ const NoteDisplay: React.FC<NoteDisplayProps> = ({ content, sourceUrl }) => {
   const noteRef = useRef<HTMLDivElement>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [noteContent, setNoteContent] = useState(content);
+  const [isEditing, setIsEditing] = useState(false);
   const user = AuthService.getCurrentUser();
   const isPremiumUser = user?.isPremium || false;
   
@@ -90,13 +92,39 @@ const NoteDisplay: React.FC<NoteDisplayProps> = ({ content, sourceUrl }) => {
     setIsSaved(false); // Reset saved state since content has changed
   };
   
+  const handleEditorSave = (newContent: string) => {
+    setNoteContent(newContent);
+    setIsEditing(false);
+    setIsSaved(false); // Reset saved state since content has changed
+  };
+  
   if (!noteContent) return null;
+  
+  if (isEditing) {
+    return (
+      <div className="w-full max-w-4xl mx-auto mt-8 mb-12">
+        <NotesEditor 
+          content={noteContent} 
+          onSave={handleEditorSave} 
+          onCancel={() => setIsEditing(false)} 
+        />
+      </div>
+    );
+  }
   
   return (
     <div className="w-full max-w-4xl mx-auto mt-8 mb-12">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Your Notes</h2>
         <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-2"
+          >
+            <Edit className="h-4 w-4" />
+            Edit Notes
+          </Button>
           {isPremiumUser && (
             <CustomizeNoteDialog 
               content={noteContent} 
